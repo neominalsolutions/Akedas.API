@@ -113,6 +113,28 @@ app.UseHttpsRedirection(); // http isteklerini https yönlendirir.
 
 app.UseAuthorization(); // yetkilendirme yönetimi, Authorize attribute kullanýmý
 
+
+
+app.Use(async (context, next) =>
+{
+  if(context.Request.Method == HttpMethod.Post.ToString())
+  {
+
+  }
+
+  Console.WriteLine("IsAuthenticated" + context.User.Identity.IsAuthenticated);
+
+  Console.WriteLine("request Path, Method" + context.Request.Path + context.Request.Method );
+
+
+  // context => HttpContext
+  await next(); // bir sonraki middleware iþi devretmek.
+  Console.WriteLine("Response" + context.Response.StatusCode);
+
+  await context.Response.WriteAsJsonAsync(new { message = "myMessage" });
+  // isteði sonlandýr ekrana json çýktý yazdýr.
+});
+
 app.MapControllers(); // gelen isteklerin controllerlara yönlendirilmesini saðlayan middleware
 
-app.Run();
+app.Run(); // Kýsa devre middleware, buradan sonra sunucu response döner. bu rundan sonra iç bir ara yazýlým çalýþamaz.
