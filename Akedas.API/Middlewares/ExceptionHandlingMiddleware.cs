@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using Microsoft.Data.SqlClient;
+using System.Net;
 using System.Net.Mime;
 
 namespace Akedas.API.Middlewares
@@ -26,11 +27,32 @@ namespace Akedas.API.Middlewares
       {
         await next(context);
       }
+      catch(SqlException ex)
+      {
+        await HandleCustomError(context, "Lütfen sistem admini ile haberleşin");
+      }
       catch (Exception ex)
       {
         await HandleCustomError(context, ex);
 
       }
+    }
+
+    private async Task HandleCustomError(HttpContext httpContext, string message)
+    {
+      httpContext.Response.ContentType = MediaTypeNames.Application.Json;
+      httpContext.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
+      var response = new ApiErrorModel()
+      {
+        Message = message,
+        StatusCode = 500
+
+      };
+
+      this.logger.LogInformation(message);
+
+      await httpContext.Response.WriteAsJsonAsync(response);
     }
 
     private async Task HandleCustomError(HttpContext httpContext, Exception ex)

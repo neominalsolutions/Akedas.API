@@ -1,0 +1,8 @@
+version: '3.4'
+
+services:
+  akedas.api:
+    image: ${DOCKER_REGISTRY-}akedasapi
+    build:
+      context: .
+      dockerfile: Akedas.API/Dockerfile
