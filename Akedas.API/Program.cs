@@ -1,6 +1,9 @@
 using Akedas.API.Data.Contexts;
 using Akedas.API.Services;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +20,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // DbContext service olarak uygulamaya tanýttýk
+
+#region EFCore
 
 string dbProvider = builder.Configuration.GetSection("DBProvider").GetValue<string>("Default");
 
@@ -37,6 +42,10 @@ builder.Services.AddDbContext<AppDbContext>(opt =>
 // Scope serviceler web istekleri için kullanýlýyor.
 builder.Services.AddScoped<PostService>();
 
+#endregion
+
+#region Cors
+
 // CROSS ORIGIN REQUEST SHARING ayarý
 // Uygulama yetkilendirmesi
 builder.Services.AddCors(opt =>
@@ -53,6 +62,38 @@ builder.Services.AddCors(opt =>
     policy.AllowAnyHeader();
   });
 });
+
+#endregion
+
+#region Mediator
+
+// auto-handler register with reflection.
+builder.Services.AddMediatR(config =>
+{
+  // bu proje içerisindeki tüm handlerlarý serviceleri tanýt.
+  config.RegisterServicesFromAssemblies(Assembly.GetExecutingAssembly());
+});
+
+//builder.Services.AddScoped<AHandler>();
+
+#endregion
+
+#region AutoMapper
+
+// Reflection ile tüm Profile türeyen nesneleri bulur. Bunlarýn programa service olarak tanýtýlmasýný saðlar.
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
+#endregion
+
+#region FluentValidation
+
+// uygulama bütün validatorlarýn reflection ile tanýtýlmasý
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+builder.Services.AddFluentValidationAutoValidation(); // mvc artýk kendi validationlarýný kullanmasýn bunun yerine validator nesnelerini kullansýn.
+builder.Services.AddFluentValidationClientsideAdapters(); // json formatýnda validasyon hata çýktýsý
+
+#endregion
 
 
 var app = builder.Build(); // servisler iþlensin diye build edilir.

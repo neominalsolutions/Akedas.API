@@ -9,7 +9,7 @@ namespace Akedas.API.Data.Configurations
     public void Configure(EntityTypeBuilder<Post> builder)
     {
       builder.HasKey(x => x.Id);
-      builder.HasIndex(x => x.Title).IsUnique(); // Unique Index
+      builder.HasIndex(x => x.Title).IsUnique(true); // Unique Index
       builder.Property(x => x.Title).IsRequired();
       builder.HasMany(x => x.Comments); // 1 to many
       builder.Property(x => x.Content).HasMaxLength(200).IsRequired();

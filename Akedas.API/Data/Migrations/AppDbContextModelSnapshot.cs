@@ -75,7 +75,7 @@ namespace Akedas.API.Data.Migrations
                     b.HasIndex("Title")
                         .IsUnique();
 
-                    b.ToTable("Posts");
+                    b.ToTable("Posts", (string)null);
                 });
 
             modelBuilder.Entity("Akedas.API.Data.Entities.Comment", b =>
