@@ -1,5 +1,7 @@
 using Akedas.API.Data.Contexts;
+using Akedas.API.Middlewares;
 using Akedas.API.Services;
+using Azure.Core;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore;
@@ -96,6 +98,10 @@ builder.Services.AddFluentValidationClientsideAdapters(); // json formatýnda val
 #endregion
 
 
+#region Middlewares
+builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+#endregion 
+
 var app = builder.Build(); // servisler iþlensin diye build edilir.
 
 
@@ -113,8 +119,10 @@ app.UseHttpsRedirection(); // http isteklerini https yönlendirir.
 
 app.UseAuthorization(); // yetkilendirme yönetimi, Authorize attribute kullanýmý
 
+// uygulamaya middleware tanýttýk.
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-
+/*
 app.Use(async (context, next) =>
 {
   if(context.Request.Method == HttpMethod.Post.ToString())
@@ -131,9 +139,15 @@ app.Use(async (context, next) =>
   await next(); // bir sonraki middleware iþi devretmek.
   Console.WriteLine("Response" + context.Response.StatusCode);
 
+  // string bodyContent = new StreamReader(context.Response.Body).ReadToEnd();
+
+  // Console.WriteLine($"bodyContent: {bodyContent}");
+
   await context.Response.WriteAsJsonAsync(new { message = "myMessage" });
   // isteði sonlandýr ekrana json çýktý yazdýr.
 });
+
+*/
 
 app.MapControllers(); // gelen isteklerin controllerlara yönlendirilmesini saðlayan middleware
 
