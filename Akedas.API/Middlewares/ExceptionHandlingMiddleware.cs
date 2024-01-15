@@ -1,5 +1,7 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using System.Net;
+using System.Net.Http;
 using System.Net.Mime;
 
 namespace Akedas.API.Middlewares
@@ -25,9 +27,11 @@ namespace Akedas.API.Middlewares
     {
       try
       {
+
         await next(context);
+
       }
-      catch(SqlException ex)
+      catch (SqlException ex)
       {
         await HandleCustomError(context, "Lütfen sistem admini ile haberleşin");
       }
@@ -68,6 +72,8 @@ namespace Akedas.API.Middlewares
       };
 
       this.logger.LogInformation(ex.Message);
+
+    
 
       await httpContext.Response.WriteAsJsonAsync(response);
     }

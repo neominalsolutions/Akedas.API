@@ -100,12 +100,14 @@ builder.Services.AddFluentValidationClientsideAdapters(); // json formatýnda val
 
 #region Middlewares
 builder.Services.AddTransient<ExceptionHandlingMiddleware>();
+builder.Services.AddTransient<ResponseBodyReadMiddleware>();
 #endregion 
 
 var app = builder.Build(); // servisler iþlensin diye build edilir.
 
+app.UseMiddleware<ResponseBodyReadMiddleware>();
 
-app.UseCors(); // cors middleware cors ayarlarýný spa uygulama için aç
+// app.UseCors(); // cors middleware cors ayarlarýný spa uygulama için aç
 
 // web application instance üzerinde middleware çalýþýr.
 // Configure the HTTP request pipeline.
@@ -121,6 +123,7 @@ app.UseAuthorization(); // yetkilendirme yönetimi, Authorize attribute kullanýmý
 
 // uygulamaya middleware tanýttýk.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 
 /*
 app.Use(async (context, next) =>
@@ -150,5 +153,7 @@ app.Use(async (context, next) =>
 */
 
 app.MapControllers(); // gelen isteklerin controllerlara yönlendirilmesini saðlayan middleware
+
+
 
 app.Run(); // Kýsa devre middleware, buradan sonra sunucu response döner. bu rundan sonra iç bir ara yazýlým çalýþamaz.
