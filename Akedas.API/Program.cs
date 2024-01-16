@@ -104,9 +104,6 @@ builder.Services.AddTransient<ResponseBodyReadMiddleware>();
 #endregion 
 
 var app = builder.Build(); // servisler iþlensin diye build edilir.
-
-app.UseMiddleware<ResponseBodyReadMiddleware>();
-
 // app.UseCors(); // cors middleware cors ayarlarýný spa uygulama için aç
 
 // web application instance üzerinde middleware çalýþýr.
@@ -117,13 +114,15 @@ if (app.Environment.IsDevelopment())
   app.UseSwaggerUI();
 }
 
+app.UseMiddleware<ResponseBodyReadMiddleware>();
+// doðru istek atýlan body okunsun diye build hemen sonra çalýþtýrýlaým
+
 app.UseHttpsRedirection(); // http isteklerini https yönlendirir.
 
 app.UseAuthorization(); // yetkilendirme yönetimi, Authorize attribute kullanýmý
 
 // uygulamaya middleware tanýttýk.
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 
 /*
 app.Use(async (context, next) =>
